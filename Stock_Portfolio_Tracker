@@ -1,0 +1,58 @@
+import yfinance as yf
+
+class StockPortfolio:
+    def __init__(self):
+        self.portfolio = {}
+
+    def add_stock(self, ticker, shares):
+        if ticker in self.portfolio:
+            self.portfolio[ticker] += shares
+        else:
+            self.portfolio[ticker] = shares
+        print(f"Added {shares} shares of {ticker}.")
+
+    def remove_stock(self, ticker, shares):
+        if ticker in self.portfolio:
+            if shares >= self.portfolio[ticker]:
+                del self.portfolio[ticker]
+                print(f"Removed all shares of {ticker}.")
+            else:
+                self.portfolio[ticker] -= shares
+                print(f"Removed {shares} shares of {ticker}.")
+        else:
+            print(f"{ticker} not in portfolio.")
+
+    def show_portfolio(self):
+        print("\nYour Portfolio:")
+        total_value = 0
+        for ticker, shares in self.portfolio.items():
+            stock = yf.Ticker(ticker)
+            data = stock.history(period="1d")
+            price = data['Close'].iloc[-1]
+            value = price * shares
+            total_value += value
+            print(f"{ticker}: {shares} shares @ {price:.2f} USD = {value:.2f} USD")
+        print(f"Total Portfolio Value: {total_value:.2f} USD\n")
+
+def main():
+    tracker = StockPortfolio()
+    while True:
+        print("Options: add, remove, show, exit")
+        choice = input("Enter your choice: ").lower()
+        if choice == "add":
+            ticker = input("Enter stock ticker (e.g., AAPL): ").upper()
+            shares = int(input("Enter number of shares: "))
+            tracker.add_stock(ticker, shares)
+        elif choice == "remove":
+            ticker = input("Enter stock ticker: ").upper()
+            shares = int(input("Enter number of shares to remove: "))
+            tracker.remove_stock(ticker, shares)
+        elif choice == "show":
+            tracker.show_portfolio()
+        elif choice == "exit":
+            break
+        else:
+            print("Invalid choice. Try again.")
+
+if __name__ == "__main__":
+    main()
