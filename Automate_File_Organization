@@ -1,0 +1,36 @@
+import os
+import shutil
+
+# Customize the path to your Downloads folder
+downloads_path = os.path.expanduser("~/Downloads")
+
+# Define file type categories
+file_types = {
+    'Images': ['.jpg', '.jpeg', '.png', '.gif', '.bmp'],
+    'Documents': ['.pdf', '.docx', '.txt', '.xlsx', '.pptx'],
+    'Videos': ['.mp4', '.mkv', '.mov', '.avi'],
+    'Archives': ['.zip', '.rar', '.tar', '.gz'],
+    'Scripts': ['.py', '.js', '.sh', '.bat']
+}
+
+# Create folders if they don't exist and move files
+def organize_files():
+    for file in os.listdir(downloads_path):
+        file_path = os.path.join(downloads_path, file)
+        if os.path.isfile(file_path):
+            moved = False
+            for category, extensions in file_types.items():
+                if file.lower().endswith(tuple(extensions)):
+                    category_path = os.path.join(downloads_path, category)
+                    os.makedirs(category_path, exist_ok=True)
+                    shutil.move(file_path, os.path.join(category_path, file))
+                    moved = True
+                    break
+            if not moved:
+                others_path = os.path.join(downloads_path, "Others")
+                os.makedirs(others_path, exist_ok=True)
+                shutil.move(file_path, os.path.join(others_path, file))
+
+if __name__ == "__main__":
+    organize_files()
+    print("Files organized successfully!")
